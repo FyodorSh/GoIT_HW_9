@@ -48,71 +48,75 @@ RECORDS = {}
 
 
 def input_error(func):
-    def wrapper(*args, **kwargs):
-        if func == get_handler:
-            try:
-                return func(*args, **kwargs)
-            except KeyError:
-                print("Wrong command")
-            except IndexError:
-                print("Wrong command")
-        elif func == add:
-            try:
-                return func(*args, **kwargs)
-            except IndexError:
-                print("Give me name and phone please")
-        else:
-            return func(*args, **kwargs)
+    def wrapper(*args):
+        try:
+            return func(*args)
+        except KeyError:
+            print("Wrong command")
+        except IndexError:
+            print("Wrong command")
     return wrapper
 
 
 # Procedures
 
 
-def hello(*args):
+def hello():
     print("How can I help you?")
 
 
 @input_error
 def add(*args):
-    contact_name = args[0][1]
-    contact_phone = args[0][2]
+    command_list = args[0]
+    if not len(command_list) == 2:
+        print("Give me name and phone please")
+        return
+    contact_name = command_list[0]
+    contact_phone = command_list[1]
     RECORDS[contact_name] = contact_phone
 
 
 @input_error
 def change(*args):
-    contact_name = args[0][1]
-    contact_phone = args[0][2]
+    command_list = args[0]
+    if not len(command_list) == 2:
+        print("Give me name and phone please")
+        return
+    contact_name = command_list[0]
+    contact_phone = command_list[1]
     RECORDS[contact_name] = contact_phone
 
 
 @input_error
 def phone(*args):
-    contact_name = args[0][1]
+    command_list = args[0]
+    if not len(command_list) == 2:
+        print("Enter user name")
+        return
+
+    contact_name = args[0][0]
     print(RECORDS[contact_name])
 
 
 @input_error
-def show(*args):
+def show():
     for key, data in RECORDS.items():
         print(f"Name: {key} - Phone: {data}")
 
 
-@input_error
-def stop(*args):
+def stop():
     print("Good bye!")
     quit()
 
 
 @input_error
 def get_handler(command_list):
-    return read_command_list(command_list, 0)
+    return read_command_list(command_list)
 
 
-def read_command_list(command_list: list, iteration: int, command=None):
-    command = OPERATIONS[command_list[iteration].lower()]
-    command = read_command_list(command_list, (iteration + 1), command) if command == read_command_list else command
+def read_command_list(command_list: list):
+    command = OPERATIONS[command_list.pop(0).lower()]
+    command = read_command_list(command_list) if command == read_command_list else command
     return command
 
 
@@ -136,7 +140,10 @@ def bot():
         command_list = command.split(sep=" ")
         handler = get_handler(command_list)
         if not (handler is None):
-            handler(command_list)
+            if len(command_list) == 0:
+                handler()
+            else:
+                handler(command_list)
 
 
 if __name__ == '__main__':
