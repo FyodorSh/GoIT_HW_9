@@ -90,7 +90,7 @@ def change(*args):
 @input_error
 def phone(*args):
     command_list = args[0]
-    if not len(command_list) == 2:
+    if not len(command_list) == 1:
         print("Enter user name")
         return
 
@@ -139,8 +139,8 @@ def bot():
         command = input("Enter command: ")
         command_list = command.split(sep=" ")
         handler = get_handler(command_list)
-        if not (handler is None):
-            if len(command_list) == 0:
+        if handler is not None:
+            if not command_list:
                 handler()
             else:
                 handler(command_list)
